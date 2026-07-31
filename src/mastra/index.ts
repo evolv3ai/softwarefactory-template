@@ -24,6 +24,7 @@ import { LocalSandbox } from '@mastra/core/workspace';
 import { LibSQLFactoryStorage } from '@mastra/libsql';
 import { PgVector, PgFactoryStorage } from '@mastra/pg';
 import { PlatformSandbox } from '@mastra/platform-workspace';
+import { RailwaySandbox } from '@mastra/railway';
 import { RedisStreamsPubSub } from '@mastra/redis-streams';
 import { getDatabasePath } from '@mastra/code-sdk/utils/project';
 import { DEFAULT_RETENTION } from '@mastra/code-sdk/utils/storage-maintenance';
@@ -147,15 +148,35 @@ function localSandboxEnv(): Record<string, string> {
 const PLATFORM_SANDBOX_ENV_KEYS = ['MASTRA_ENVIRONMENT_ID', 'MASTRA_PROJECT_ID', 'MASTRA_PLATFORM_SECRET_KEY'] as const;
 const hasPlatformSandboxEnv = PLATFORM_SANDBOX_ENV_KEYS.every(key => Boolean(process.env[key]?.trim()));
 
-// Use PlatformSandbox only when its complete identity is configured. Otherwise
+// Sandbox provider selection: Railway is an explicit opt-in via
+// MASTRACODE_SANDBOX_PROVIDER=railway — a stray RAILWAY_API_TOKEN alone must not
+// silently start billing cloud VMs, and selecting railway without credentials
+// fails the boot loudly. No env map is passed to RailwaySandbox: host secrets
+// stay out of the VM, and token/environmentId come from the constructor's own
+// RAILWAY_API_TOKEN / RAILWAY_ENVIRONMENT_ID fallback. With the provider unset,
+// use PlatformSandbox only when its complete identity is configured, otherwise
 // fall back to LocalSandbox for single-user development.
-const sandbox = hasPlatformSandboxEnv
-  ? new PlatformSandbox()
-  : new LocalSandbox({
-      workingDirectory:
-        process.env.MASTRACODE_LOCAL_SANDBOX_ROOT?.trim() || join(homedir(), '.mastracode', 'web', 'sandboxes'),
-      env: localSandboxEnv(),
-    });
+const sandboxProvider = process.env.MASTRACODE_SANDBOX_PROVIDER?.trim().toLowerCase();
+if (
+  sandboxProvider === 'railway' &&
+  !(process.env.RAILWAY_API_TOKEN?.trim() && process.env.RAILWAY_ENVIRONMENT_ID?.trim())
+) {
+  throw new Error(
+    'MASTRACODE_SANDBOX_PROVIDER=railway requires RAILWAY_API_TOKEN and RAILWAY_ENVIRONMENT_ID.',
+  );
+}
+const sandbox =
+  sandboxProvider === 'railway'
+    ? new RailwaySandbox({
+        idleTimeoutMinutes: positiveInt(process.env.MASTRACODE_SANDBOX_IDLE_MINUTES) ?? 30,
+      })
+    : hasPlatformSandboxEnv
+      ? new PlatformSandbox()
+      : new LocalSandbox({
+          workingDirectory:
+            process.env.MASTRACODE_LOCAL_SANDBOX_ROOT?.trim() || join(homedir(), '.mastracode', 'web', 'sandboxes'),
+          env: localSandboxEnv(),
+        });
 
 // One FactoryStorage backend powers agent storage, the factory app tables,
 // the distributed project lock, and better-auth. `DATABASE_URL` set →

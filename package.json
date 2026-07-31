@@ -23,6 +23,7 @@
     "@mastra/memory": "1.24.0-alpha.0",
     "@mastra/pg": "1.18.0-alpha.2",
     "@mastra/platform-workspace": "0.2.2-alpha.0",
+    "@mastra/railway": "^0.4.0",
     "@mastra/redis-streams": "0.3.0",
     "zod": "^4.3.6"
   },
