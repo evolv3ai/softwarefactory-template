@@ -31,6 +31,7 @@ import { MastraFactory } from '@mastra/factory';
 import { GithubIntegration } from '@mastra/factory/integrations/github/integration';
 import { LinearIntegration } from '@mastra/factory/integrations/linear/integration';
 import type { IMastraAuthProvider } from '@mastra/core/server';
+import { MastraAuthWorkos } from '@mastra/auth-workos';
 
 /**
  * Parse a positive-integer env knob; anything else means "use the default".
@@ -72,6 +73,11 @@ let auth: IMastraAuthProvider | null | undefined;
 
 if (authDisabled) {
   auth = null;
+} else if (process.env.WORKOS_API_KEY?.trim() && process.env.WORKOS_CLIENT_ID?.trim()) {
+  // WORKOS_* env vars present → use WorkOS AuthKit instead of the default
+  // MastraAuthStudio (which proxies to platform.mastra.ai). MastraAuthWorkos
+  // reads apiKey/clientId/redirectUri/cookiePassword from env on its own.
+  auth = new MastraAuthWorkos();
 }
 
 // Direct GitHub App fallback: when the platform-backed integration isn't in

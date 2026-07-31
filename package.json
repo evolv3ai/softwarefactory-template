@@ -15,15 +15,16 @@
     "deploy": "mastra deploy"
   },
   "dependencies": {
+    "@mastra/auth-workos": "^1.6.4",
     "@mastra/code-sdk": "1.1.0-alpha.4",
     "@mastra/core": "1.54.0-alpha.4",
     "@mastra/factory": "0.2.2-alpha.4",
     "@mastra/libsql": "1.18.0-alpha.1",
+    "@mastra/memory": "1.24.0-alpha.0",
     "@mastra/pg": "1.18.0-alpha.2",
     "@mastra/platform-workspace": "0.2.2-alpha.0",
     "@mastra/redis-streams": "0.3.0",
-    "zod": "^4.3.6",
-    "@mastra/memory": "1.24.0-alpha.0"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "22.20.1",
