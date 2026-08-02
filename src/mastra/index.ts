@@ -178,22 +178,24 @@ const DENY_STEP = 'curl -fsSL https://github.com/EmbarkStudios/cargo-deny/releas
 // and corepack live under /root/.local/share/mise and stopped resolving in the
 // non-login `sh -c` context that runs worktree setup commands, agent
 // execute_command calls and sandbox filesystem ops (exit 127 "pnpm: not
-// found"). /usr/local/bin is on PATH in every exec-service PATH regime
-// observed, so symlink the node toolchain there. Template-built VMs do not
-// export PATH into command environments, so `#!/usr/bin/env node` shebangs
-// (pnpm, npm, corepack are scripts) resolve via the execvp fallback
-// /bin:/usr/bin — hence the extra node symlink into /usr/bin. test -x fails
-// the image build loudly if the mise layout drifts again; the trailing
-// version calls run through the symlinks themselves (pnpm exercises the
-// shebang chain), so a broken link also fails the build.
-const NODE_STEP = 'd=/root/.local/share/mise/installs/node/lts/bin; for b in node npm npx corepack pnpm pnpx yarn; do test -x $d/$b && ln -sf $d/$b /usr/local/bin/$b || exit 1; done && ln -sf $d/node /usr/bin/node && /usr/local/bin/node --version && /usr/local/bin/pnpm --version && /usr/local/bin/corepack --version';
-// Template-built VMs provide NO PATH in command environments at all (probed
-// 2026-08-02), which breaks corepack's self-lookup and every child process a
-// package manager spawns. Bake a static PATH into the sandbox at creation
-// (SandboxCreationOptions.env is "available to every command"). The literal
-// carries no host-derived value, preserving patch 4's no-host-secrets
-// invariant. The trailing mise bin dir is a safety net for VMs served from a
-// template cache that predates NODE_STEP's symlinks.
+// found"). Template-built VMs additionally run commands with NO PATH in the
+// environment at all, which breaks corepack's self-lookup and every child
+// process a package manager spawns — plain symlinks are not enough. NODE_STEP
+// therefore writes wrapper scripts into /usr/local/bin (found via the shell's
+// built-in default PATH) that export a usable PATH and exec the mise
+// binaries; node is also copied to /usr/bin for `#!/usr/bin/env node`
+// shebangs, whose execvp fallback searches /bin:/usr/bin. test -x fails the
+// image build loudly if the mise layout drifts; the trailing version calls
+// execute through the wrappers (pnpm exercises the env-shebang chain), so a
+// broken wrapper also fails the build.
+const NODE_STEP = 'd=/root/.local/share/mise/installs/node/lts/bin; P=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$d; for b in node npm npx corepack pnpm pnpx yarn; do test -x $d/$b || exit 1; printf \'#!/bin/sh\\nPATH="${PATH:-%s}"\\nexport PATH\\nexec %s "$@"\\n\' "$P" "$d/$b" > /usr/local/bin/$b && chmod 755 /usr/local/bin/$b || exit 1; done && cp /usr/local/bin/node /usr/bin/node && /usr/local/bin/node --version && /usr/local/bin/pnpm --version && /usr/local/bin/corepack --version';
+// A static PATH is also baked at sandbox creation for completeness — but the
+// factory fleet always passes its own env ({ GH_TOKEN }) to clone()
+// (fleet.js #build), and RailwaySandbox.clone resolves `options.env ??
+// this._env`, so this constructor env is DISPLACED on every fleet VM. The
+// NODE_STEP wrappers above are the mechanism that actually reaches fleet
+// sessions; this literal only covers non-fleet creates. Nothing host-derived
+// either way, preserving patch 4's no-host-secrets invariant.
 const SANDBOX_PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/.local/share/mise/installs/node/lts/bin';
 if (
   sandboxProvider === 'railway' &&
