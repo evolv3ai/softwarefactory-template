@@ -151,22 +151,50 @@ const hasPlatformSandboxEnv = PLATFORM_SANDBOX_ENV_KEYS.every(key => Boolean(pro
 // Sandbox provider selection: Railway is an explicit opt-in via
 // MASTRACODE_SANDBOX_PROVIDER=railway — a stray RAILWAY_API_TOKEN alone must not
 // silently start billing cloud VMs, and selecting railway without credentials
-// fails the boot loudly. No env map is passed to RailwaySandbox: host secrets
-// stay out of the VM, and token/environmentId come from the constructor's own
-// RAILWAY_API_TOKEN / RAILWAY_ENVIRONMENT_ID fallback. With the provider unset,
+// fails the boot loudly. The only env passed to RailwaySandbox is a static
+// PATH literal (patch 4c, SANDBOX_PATH below) — nothing host-derived, so host
+// secrets stay out of the VM — and token/environmentId come from the
+// constructor's own RAILWAY_API_TOKEN / RAILWAY_ENVIRONMENT_ID fallback. With
+// the provider unset,
 // use PlatformSandbox only when its complete identity is configured, otherwise
 // fall back to LocalSandbox for single-user development.
 const sandboxProvider = process.env.MASTRACODE_SANDBOX_PROVIDER?.trim().toLowerCase();
-// Custom base image for Railway sandboxes (patch 4b): Go + Rust toolchains at
-// pinned versions, so factory sessions can run cargo/go gates in-VM. Template
-// builds are content-addressed server-side — identical recipes are cache hits,
-// so the build cost is paid once per recipe change, not per sandbox.
+// Custom base image for Railway sandboxes (patches 4b/4c): Go and Rust at
+// pinned versions plus clippy, cargo-deny and unzip, so factory sessions can
+// run cargo/go gates in-VM, and the base image's mise-managed node toolchain
+// symlinked into /usr/local/bin (NODE_STEP below). Template builds are
+// content-addressed on the recipe (per the Railway SDK docs) — identical
+// recipes are cache hits, so the build cost is paid once per recipe change,
+// not per sandbox. The cache key does NOT include the underlying base image:
+// a cached recipe keeps serving an image built on an old base even after
+// Railway rolls a new one (observed 2026-08-02).
 // MASTRACODE_SANDBOX_TEMPLATE=off falls back to the stock image (kill switch
 // for when a toolchain download source breaks template builds).
 const sandboxTemplate = process.env.MASTRACODE_SANDBOX_TEMPLATE?.trim().toLowerCase() ?? 'toolchains';
 const GO_STEP = 'curl -fsSL https://go.dev/dl/go1.26.5.linux-amd64.tar.gz | tar -C /usr/local -xz && ln -s /usr/local/go/bin/go /usr/local/go/bin/gofmt /usr/local/bin/';
 const RUST_STEP = 'curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile default --default-toolchain 1.97.1 && ln -s /root/.cargo/bin/* /usr/local/bin/';
 const DENY_STEP = 'curl -fsSL https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz | tar -xz -C /tmp && install /tmp/cargo-deny-0.20.2-x86_64-unknown-linux-musl/cargo-deny /root/.cargo/bin/ && ln -s /root/.cargo/bin/cargo-deny /usr/local/bin/';
+// Patch 4c (2026-08-02): the Railway base image went mise-managed — node, pnpm
+// and corepack live under /root/.local/share/mise and stopped resolving in the
+// non-login `sh -c` context that runs worktree setup commands, agent
+// execute_command calls and sandbox filesystem ops (exit 127 "pnpm: not
+// found"). /usr/local/bin is on PATH in every exec-service PATH regime
+// observed, so symlink the node toolchain there. Template-built VMs do not
+// export PATH into command environments, so `#!/usr/bin/env node` shebangs
+// (pnpm, npm, corepack are scripts) resolve via the execvp fallback
+// /bin:/usr/bin — hence the extra node symlink into /usr/bin. test -x fails
+// the image build loudly if the mise layout drifts again; the trailing
+// version calls run through the symlinks themselves (pnpm exercises the
+// shebang chain), so a broken link also fails the build.
+const NODE_STEP = 'd=/root/.local/share/mise/installs/node/lts/bin; for b in node npm npx corepack pnpm pnpx yarn; do test -x $d/$b && ln -sf $d/$b /usr/local/bin/$b || exit 1; done && ln -sf $d/node /usr/bin/node && /usr/local/bin/node --version && /usr/local/bin/pnpm --version && /usr/local/bin/corepack --version';
+// Template-built VMs provide NO PATH in command environments at all (probed
+// 2026-08-02), which breaks corepack's self-lookup and every child process a
+// package manager spawns. Bake a static PATH into the sandbox at creation
+// (SandboxCreationOptions.env is "available to every command"). The literal
+// carries no host-derived value, preserving patch 4's no-host-secrets
+// invariant. The trailing mise bin dir is a safety net for VMs served from a
+// template cache that predates NODE_STEP's symlinks.
+const SANDBOX_PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/.local/share/mise/installs/node/lts/bin';
 if (
   sandboxProvider === 'railway' &&
   !(process.env.RAILWAY_API_TOKEN?.trim() && process.env.RAILWAY_ENVIRONMENT_ID?.trim())
@@ -179,8 +207,9 @@ const sandbox =
   sandboxProvider === 'railway'
     ? new RailwaySandbox({
         idleTimeoutMinutes: positiveInt(process.env.MASTRACODE_SANDBOX_IDLE_MINUTES) ?? 30,
+        env: { PATH: SANDBOX_PATH },
         ...(sandboxTemplate !== 'off'
-          ? { template: t => t.withPackages('unzip').run(GO_STEP).run(RUST_STEP).run(DENY_STEP) }
+          ? { template: t => t.withPackages('unzip').run(GO_STEP).run(RUST_STEP).run(DENY_STEP).run(NODE_STEP) }
           : {}),
       })
     : hasPlatformSandboxEnv
