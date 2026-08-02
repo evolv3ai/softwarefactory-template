@@ -157,6 +157,16 @@ const hasPlatformSandboxEnv = PLATFORM_SANDBOX_ENV_KEYS.every(key => Boolean(pro
 // use PlatformSandbox only when its complete identity is configured, otherwise
 // fall back to LocalSandbox for single-user development.
 const sandboxProvider = process.env.MASTRACODE_SANDBOX_PROVIDER?.trim().toLowerCase();
+// Custom base image for Railway sandboxes (patch 4b): Go + Rust toolchains at
+// pinned versions, so factory sessions can run cargo/go gates in-VM. Template
+// builds are content-addressed server-side — identical recipes are cache hits,
+// so the build cost is paid once per recipe change, not per sandbox.
+// MASTRACODE_SANDBOX_TEMPLATE=off falls back to the stock image (kill switch
+// for when a toolchain download source breaks template builds).
+const sandboxTemplate = process.env.MASTRACODE_SANDBOX_TEMPLATE?.trim().toLowerCase() ?? 'toolchains';
+const GO_STEP = 'curl -fsSL https://go.dev/dl/go1.26.5.linux-amd64.tar.gz | tar -C /usr/local -xz && ln -s /usr/local/go/bin/go /usr/local/go/bin/gofmt /usr/local/bin/';
+const RUST_STEP = 'curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile default --default-toolchain 1.97.1 && ln -s /root/.cargo/bin/* /usr/local/bin/';
+const DENY_STEP = 'curl -fsSL https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz | tar -xz -C /tmp && install /tmp/cargo-deny-0.20.2-x86_64-unknown-linux-musl/cargo-deny /root/.cargo/bin/ && ln -s /root/.cargo/bin/cargo-deny /usr/local/bin/';
 if (
   sandboxProvider === 'railway' &&
   !(process.env.RAILWAY_API_TOKEN?.trim() && process.env.RAILWAY_ENVIRONMENT_ID?.trim())
@@ -169,6 +179,9 @@ const sandbox =
   sandboxProvider === 'railway'
     ? new RailwaySandbox({
         idleTimeoutMinutes: positiveInt(process.env.MASTRACODE_SANDBOX_IDLE_MINUTES) ?? 30,
+        ...(sandboxTemplate !== 'off'
+          ? { template: t => t.withPackages('unzip').run(GO_STEP).run(RUST_STEP).run(DENY_STEP) }
+          : {}),
       })
     : hasPlatformSandboxEnv
       ? new PlatformSandbox()
