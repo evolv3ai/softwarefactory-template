@@ -316,7 +316,7 @@ const integrations = [...(github ? [github] : []), ...(linear ? [linear] : [])];
 //     `configure-factory-rules` warns that Work and Review cards move
 //     independently and Work must not be marked Done merely because a pull
 //     request merged.
-const FACTORY_RULE_VERSION = 'evolv3-autonomy-v3';
+const FACTORY_RULE_VERSION = 'evolv3-autonomy-v4';
 
 /**
  * The kickoff message. Built per item so it can name the work item and the
@@ -356,15 +356,22 @@ function executeInstructions(context: FactoryStageRuleContext): string {
 }
 
 function beginExecution(context: FactoryStageRuleContext): FactoryRuleDecision | void {
-  // Fire ONLY on the plan-approval path. On a human board drag
-  // (`cause: 'board_drag'`) FactoryTransitionService unshifts its own
-  // sendMessage with `role: roleForStage('work','execute')` === 'work' and
-  // `prepareBinding: true`; because this handler returns a sendMessage rather
-  // than an invokeSkill, that decision is not absorbed as a precedingMessage,
-  // and the two differently-roled decisions would mint two sessions and two
-  // Railway VMs on one work item. `submit_plan` -> advanceApprovedPlan carries
-  // `cause: 'tool_result_rule'`.
-  if (context.cause !== 'tool_result_rule') return;
+  // Exclude ONLY the human board drag. FactoryTransitionService unshifts its
+  // own sendMessage (role `roleForStage('work','execute')` === 'work',
+  // prepareBinding: true) when `actor.type === 'human' && cause ===
+  // 'board_drag'`; because this handler returns a sendMessage rather than an
+  // invokeSkill that decision is not absorbed as a precedingMessage, and two
+  // differently-roled decisions would mint two sessions and two Railway VMs on
+  // one work item.
+  //
+  // This guard originally tested `cause !== 'tool_result_rule'`, on the
+  // assumption that plan approval always arrives via the `submit_plan` tool
+  // rule. Measured on twelvepines issue #10 (2026-08-03): the plan agent
+  // instead called `factory_transition_work_item` itself, so the execute entry
+  // carried an agent actor and a different cause — and the kickoff never
+  // fired. Both routes into execute are legitimate; only the human drag is
+  // hazardous, so exclude exactly that.
+  if (context.actor.type === 'human' || context.cause === 'board_drag') return;
   return {
     type: 'sendMessage',
     // Keyed on item + revision, not the inherited ingress chain: that chain
