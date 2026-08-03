@@ -30,7 +30,12 @@ import { getDatabasePath } from '@mastra/code-sdk/utils/project';
 import { DEFAULT_RETENTION } from '@mastra/code-sdk/utils/storage-maintenance';
 import { MastraFactory } from '@mastra/factory';
 import { defaultFactoryRules } from '@mastra/factory/rules/index';
-import type { FactoryRuleDecision, FactoryStageRuleContext } from '@mastra/factory/rules/index';
+import type {
+  FactoryRuleBoard,
+  FactoryRuleDecision,
+  FactoryStageRuleContext,
+  FactoryToolResultRuleContext,
+} from '@mastra/factory/rules/index';
 import { GithubIntegration } from '@mastra/factory/integrations/github/integration';
 import { LinearIntegration } from '@mastra/factory/integrations/linear/integration';
 import type { IMastraAuthProvider } from '@mastra/core/server';
@@ -311,7 +316,7 @@ const integrations = [...(github ? [github] : []), ...(linear ? [linear] : [])];
 //     `configure-factory-rules` warns that Work and Review cards move
 //     independently and Work must not be marked Done merely because a pull
 //     request merged.
-const FACTORY_RULE_VERSION = 'evolv3-autonomy-v1';
+const FACTORY_RULE_VERSION = 'evolv3-autonomy-v2';
 
 /**
  * The kickoff message. Built per item so it can name the work item and the
@@ -383,9 +388,63 @@ function beginExecution(context: FactoryStageRuleContext): FactoryRuleDecision |
   };
 }
 
+// ---------------------------------------------------------------------------
+// Transition reminder (patch 6) — catch the stage boundary an agent forgot.
+//
+// Every stage handoff depends on the agent remembering to call
+// `factory_transition_work_item` as its terminal step. Measured on twelvepines
+// 2026-08-03: TWO OF THREE triage sessions ran a full investigation, marked a
+// checklist item literally named "transition work item" as completed, and
+// ended the turn without ever invoking the tool (0 invocations in the thread).
+// The turn ends *successfully*, so nothing retries it and the item parks with
+// a finished session — the same dead end patch 5 fixed one stage later, but
+// reachable at every boundary and nondeterministic.
+//
+// `task_check` returning all-complete is the closest thing the runtime has to
+// a "the agent thinks it is done" hook, so that is where the reminder lands.
+// It arrives mid-turn, while the agent can still act on it.
+//
+// Loop-safe by construction: the key is per (item, revision), and
+// `factory_deferred_decisions` carries a unique index on the tenant+key with
+// UniqueViolationError swallowed at insert — so repeated `task_check` calls in
+// one revision produce exactly one reminder. A successful transition bumps the
+// revision, which is what re-arms it for the next stage.
+function awaitsTransition(board: FactoryRuleBoard, stages: readonly string[]): boolean {
+  // `execute` is deliberately excluded: patch 5's kickoff already governs it,
+  // and a reminder there could push an agent to transition before it has
+  // pushed a branch and opened the pull request.
+  return board === 'work' ? stages.includes('triage') || stages.includes('planning') : stages.includes('review');
+}
+
+function remindToTransition(context: FactoryToolResultRuleContext): FactoryRuleDecision | void {
+  if (context.result.status !== 'success' || context.actor.type !== 'agent') return;
+  if (!awaitsTransition(context.board, context.item.stages)) return;
+  const value = context.result.value;
+  const content =
+    typeof value === 'string' ? value : value && typeof value === 'object' && !Array.isArray(value) ? value.content : undefined;
+  if (typeof content !== 'string' || !content.includes('All tasks completed: YES')) return;
+  return {
+    type: 'sendMessage',
+    idempotencyKey: `transition-reminder:${context.item.id}:${context.itemRevision}`,
+    role: context.actor.role,
+    message: [
+      `Your task list reports every task complete, but this work item is still in "${context.item.stages.join(', ')}" on the ${context.board} board — no stage transition has been recorded.`,
+      '',
+      `Marking a checklist entry "completed" does not perform the transition. If this stage's work is genuinely done, call factory_transition_work_item now with expectedRevision ${context.itemRevision}; nothing else will advance the item, and a turn that ends here strands it.`,
+      '',
+      'If work remains, disregard this and carry on.',
+    ].join('\n'),
+    idleBehavior: 'wake',
+  };
+}
+
 const rules = defaultFactoryRules({
   version: FACTORY_RULE_VERSION,
   overrides: {
+    tools: {
+      // Additive: BUILT_IN_DEFAULTS.tools registers only `submit_plan`.
+      task_check: { onResult: remindToTransition },
+    },
     work: {
       execute: {
         // `issue` only. `linearIssue` and `manual` are deliberately absent:
