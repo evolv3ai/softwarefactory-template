@@ -316,7 +316,7 @@ const integrations = [...(github ? [github] : []), ...(linear ? [linear] : [])];
 //     `configure-factory-rules` warns that Work and Review cards move
 //     independently and Work must not be marked Done merely because a pull
 //     request merged.
-const FACTORY_RULE_VERSION = 'evolv3-autonomy-v4';
+const FACTORY_RULE_VERSION = 'evolv3-autonomy-v5';
 
 /**
  * The kickoff message. Built per item so it can name the work item and the
@@ -373,7 +373,22 @@ function beginExecution(context: FactoryStageRuleContext): FactoryRuleDecision |
   // hazardous, so exclude exactly that.
   if (context.actor.type === 'human' || context.cause === 'board_drag') return;
   return {
-    type: 'sendMessage',
+    // invokeSkill, NOT sendMessage — the delivery mechanism is the whole point.
+    // Measured on twelvepines issue #12: the sendMessage kickoff was delivered
+    // in 4.4 s (an active-session `deliver`, not a `wake`), the agent read two
+    // files, and the turn ended anyway. The dispatcher ships a sendMessage as a
+    // NOTIFICATION signal (`sendNotificationSignal`, kind "rule-message"),
+    // which lands as ambient context; invokeSkill ships its content as a
+    // USER signal (`sendSignal({ type: 'user' })`) — the same channel that
+    // makes factory-triage and factory-plan reliably drive a turn. A kickoff
+    // that races the tail of the planning turn needs the stronger channel.
+    //
+    // `factory-execute` is NOT bundled with @mastra/factory; it is resolved
+    // from the repo's own `.claude/skills/factory-execute/SKILL.md`, which the
+    // workspace skill registry scans as a fallback root. **Every linked repo
+    // needs that file** — an unresolvable name raises skill_not_found and
+    // burns all 5 dispatcher attempts.
+    type: 'invokeSkill',
     // Keyed on item + revision, not the inherited ingress chain: that chain
     // already runs ~200 of the 256-char idempotencyKey budget, and an overflow
     // throws inside the handler, which transition() commits as `rule_error` —
@@ -384,14 +399,9 @@ function beginExecution(context: FactoryStageRuleContext): FactoryRuleDecision |
     // plan session already holds the approved plan and the materialized
     // worktree, and this is the same session a human nudge would land on.
     role: 'plan',
-    message: executeInstructions(context),
-    // The plan turn has ended by now, so the binding is idle by definition.
-    // No `prepareBinding`: on this path the plan binding is live in-process, so
-    // it would only matter after a pm2 restart with a kickoff still queued —
-    // where it would silently mint a fresh, plan-less session on a new VM and
-    // tell it to "proceed with the approved plan" it cannot see. Failing loudly
-    // with "No active Factory binding for role plan." is the better outcome.
-    idleBehavior: 'wake',
+    skillName: 'factory-execute',
+    arguments: context.item.url ? `${context.item.title} (${context.item.url})` : context.item.title,
+    precedingMessage: executeInstructions(context),
   };
 }
 
