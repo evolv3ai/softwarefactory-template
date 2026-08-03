@@ -316,7 +316,7 @@ const integrations = [...(github ? [github] : []), ...(linear ? [linear] : [])];
 //     `configure-factory-rules` warns that Work and Review cards move
 //     independently and Work must not be marked Done merely because a pull
 //     request merged.
-const FACTORY_RULE_VERSION = 'evolv3-autonomy-v2';
+const FACTORY_RULE_VERSION = 'evolv3-autonomy-v3';
 
 /**
  * The kickoff message. Built per item so it can name the work item and the
@@ -438,12 +438,82 @@ function remindToTransition(context: FactoryToolResultRuleContext): FactoryRuleD
   };
 }
 
+// ---------------------------------------------------------------------------
+// Triage auto-advance (patch 7) — stop depending on the agent for bookkeeping.
+//
+// Measured on twelvepines: THREE OF FOUR triage sessions finished their
+// investigation and ended the turn without calling
+// `factory_transition_work_item`. Issue #9 is the clearest case — it marked
+// all four substantive tasks `completed`, set a fifth task literally named
+// "Request Factory stage transition" to `in_progress`, wrote its handoff, and
+// stopped. Patch 6's reminder could not even arm there, because that session
+// never called `task_check`; tool usage varies run to run, so no
+// single-tool nudge is a reliable net.
+//
+// `task_update` IS called by every session (it is how the checklist moves) and
+// its result carries a structured `tasks` array, so this rule reads state
+// rather than parsing prose. When every substantive task is complete and the
+// only thing left is the transition itself, the deployment performs the
+// transition — a `transition` decision, which is the sanctioned mechanism
+// (`configure-factory-rules`: "Request follow-up transitions through
+// FactoryRuleDecision. Never mutate stage storage directly.").
+//
+// Preferred over another reminder because it removes the LLM from a step that
+// carries no judgement: the investigation is already in the thread, and
+// planning continues in that same thread either way.
+interface AgentTask {
+  id?: unknown;
+  status?: unknown;
+  content?: unknown;
+}
+
+function transitionish(task: AgentTask): boolean {
+  const text = `${typeof task.id === 'string' ? task.id : ''} ${typeof task.content === 'string' ? task.content : ''}`;
+  return /transition|hand ?off|advance stage/i.test(text);
+}
+
+function triageWorkIsDone(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const tasks = (value as { tasks?: unknown }).tasks;
+  if (!Array.isArray(tasks) || tasks.length < 2) return false;
+  const substantive = tasks.filter(task => !transitionish(task as AgentTask));
+  // Guard against a checklist that is nothing but bookkeeping, and against
+  // firing while real investigation work is still outstanding.
+  if (substantive.length === 0) return false;
+  return substantive.every(task => (task as AgentTask).status === 'completed');
+}
+
+function advanceFinishedTriage(context: FactoryToolResultRuleContext): FactoryRuleDecision | void {
+  if (context.result.status !== 'success') return;
+  if (context.actor.type !== 'agent' || context.actor.role !== 'triage') return;
+  if (context.board !== 'work' || context.item.stages.length !== 1 || context.item.stages[0] !== 'triage') return;
+  if (!triageWorkIsDone(context.result.value)) return;
+  return {
+    type: 'transition',
+    idempotencyKey: `triage-autoadvance:${context.item.id}:${context.itemRevision}`,
+    board: 'work',
+    stage: 'planning',
+    // Attached messages are delivered after the transition commits and are
+    // skipped when the item has no active binding, so unlike a bare
+    // `sendMessage` this cannot fail the decision on a post-restart miss.
+    message: {
+      text: [
+        'Your triage checklist showed every investigation task complete, so the Factory advanced this work item to planning for you.',
+        'The stage transition is bookkeeping the deployment now handles; you do not need to call factory_transition_work_item for it.',
+        'Continue with planning in this session.',
+      ].join('\n'),
+      role: 'triage',
+    },
+  };
+}
+
 const rules = defaultFactoryRules({
   version: FACTORY_RULE_VERSION,
   overrides: {
     tools: {
       // Additive: BUILT_IN_DEFAULTS.tools registers only `submit_plan`.
       task_check: { onResult: remindToTransition },
+      task_update: { onResult: advanceFinishedTriage },
     },
     work: {
       execute: {
