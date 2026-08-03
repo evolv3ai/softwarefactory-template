@@ -29,6 +29,8 @@ import { RedisStreamsPubSub } from '@mastra/redis-streams';
 import { getDatabasePath } from '@mastra/code-sdk/utils/project';
 import { DEFAULT_RETENTION } from '@mastra/code-sdk/utils/storage-maintenance';
 import { MastraFactory } from '@mastra/factory';
+import { defaultFactoryRules } from '@mastra/factory/rules/index';
+import type { FactoryRuleDecision, FactoryStageRuleContext } from '@mastra/factory/rules/index';
 import { GithubIntegration } from '@mastra/factory/integrations/github/integration';
 import { LinearIntegration } from '@mastra/factory/integrations/linear/integration';
 import type { IMastraAuthProvider } from '@mastra/core/server';
@@ -260,9 +262,147 @@ const vector = databaseUrl ? new PgVector({ id: 'mastra-code-vectors', connectio
 
 const integrations = [...(github ? [github] : []), ...(linear ? [linear] : [])];
 
+// ---------------------------------------------------------------------------
+// Factory rule override (patch 5) — close the point where the built-in chain
+// hands control back to a human.
+//
+// `MastraFactory` defaults to `builtInFactoryRules()`, whose chain ends at the
+// door of Building: `submit_plan` returning "Plan approved." transitions the
+// item to `execute`, and NOTHING is registered for entering that stage — no
+// onEnter rule, and no execute-stage skill ships in the installed
+// 0.2.2-alpha.4 (nor in the newest alpha published to npm). A plan session
+// therefore transitions and ends its turn, and the item parks until somebody
+// messages the session by hand. On a Railway sandbox that parking is
+// destructive: the VM idles out after `MASTRACODE_SANDBOX_IDLE_MINUTES`.
+//
+// An override replaces an exact handler leaf and never composes with it, and
+// `work.execute` is a stage the built-ins leave empty (BUILT_IN_DEFAULTS.work
+// registers only `triage` and `planning`) — no default behaviour is removed.
+// Effects are deferred by the dispatcher, per the bundled
+// `configure-factory-rules` skill; the handler stays pure and allocation-cheap
+// so it cannot approach the five-second evaluation budget.
+//
+// OPERATIONAL COST, accepted deliberately: a `sendMessage` decision is
+// dispatched with requireDelivery, and on `idleBehavior: 'wake'` the dispatcher
+// awaits `accepted.output.consumeStream()` — the WHOLE agent turn. `#tick` is
+// single-flight, so while one item is building, no other rule decision and no
+// pending start is dispatched anywhere in this deployment. The factory builds
+// strictly one work item at a time; triage/review queue behind it.
+// Do NOT "fix" this by switching to `idleBehavior: 'persist'`. That resolves to
+// `{ action: 'persist' }`, which `awaitNotification(..., true)` rejects
+// ("Factory notification did not reach the agent"), failing the decision
+// through all 5 dispatcher attempts and delivering nothing at all. `wake` is
+// the only idle behaviour that actually reaches an idle session.
+//
+// Deliberately NOT done here, after review:
+//   * Autonomous merge. There is no trustworthy trigger for it in this rule
+//     surface: `factory-review/SKILL.md` tells the reviewer to request
+//     `stage: "done"` for BOTH verdicts, so entering review/done carries no
+//     approval signal; the only repo identity a stage handler can see is
+//     `context.item.url`, which routes/work-items.js validates as nothing more
+//     than a <=2048-char string, so any org member could mint a work item
+//     bearing an allowlisted URL; and `configure-factory-rules/SKILL.md`
+//     forbids expressing deployment policy as instructions to an agent. If it
+//     is wanted, it belongs in trusted server code gated on
+//     `item.metadata.githubRepositoryId` (written by the pullRequestOpened
+//     built-in from the webhook payload) with real check-conclusion and
+//     mergeable-state reads.
+//   * Mirroring a PR merge onto its originating issue card:
+//     `configure-factory-rules` warns that Work and Review cards move
+//     independently and Work must not be marked Done merely because a pull
+//     request merged.
+const FACTORY_RULE_VERSION = 'evolv3-autonomy-v1';
+
+/**
+ * The kickoff message. Built per item so it can name the work item and the
+ * issue number the pull request has to close — the static version could not,
+ * and the agent would have had to re-derive both from a phase snapshot that
+ * carries neither.
+ *
+ * Every line here is a failure observed on the twelvepines smoke run: turns
+ * that implemented and transitioned without ever committing, and a `git push`
+ * that found no credentials because the GitHub token is injected per-`gh`
+ * -process and never exported into the shell.
+ */
+function executeInstructions(context: FactoryStageRuleContext): string {
+  const issueNumber = context.item.url?.match(/\/issues\/(\d+)(?:$|[/?#])/)?.[1];
+  return [
+    `Proceed with the approved plan for this work item: implement it AND publish the result.`,
+    `Work item: ${context.item.title}${context.item.url ? ` (${context.item.url})` : ''}`,
+    'You are autonomous here. Do not wait for human input, and do not end your turn with unpublished work.',
+    '',
+    '1. Implement the change in the session workspace. Pass an explicit cwd to every execute_command call.',
+    '2. Run the repository quality gates. Report pre-existing failures you did not cause instead of fixing unrelated breakage.',
+    '3. Publish. Commit early — an idle sandbox can be reclaimed, and uncommitted work goes with it:',
+    '   - Commit on the branch this workspace is ALREADY checked out on. The Factory created it for you from the base',
+    '     branch; do not invent a new name, and ignore general guidance about "feat/" or "fix/" prefixes — it does not',
+    '     apply here. Confirm with "git rev-parse --abbrev-ref HEAD" rather than assuming.',
+    '   - Plain git push has no credentials: origin is a plain https URL and the GitHub token reaches only the gh',
+    '     process. Push with an askpass helper, using absolute paths because these commands run with no PATH:',
+    "       printf '#!/bin/sh\\nexec /usr/bin/gh auth token\\n' > /tmp/askpass && chmod 755 /tmp/askpass",
+    '       GIT_ASKPASS=/tmp/askpass git push -u origin HEAD',
+    '     If the push is rejected for the branch NAME specifically, retry once on "sandbox/<same-name>"; do not spend',
+    '     turns on "gh auth setup-git", which has been observed not to work here.',
+    `   - Open a pull request against the repository default branch${issueNumber ? `, with "Closes #${issueNumber}" in the body` : ''}.`,
+    '4. Only after the pull request exists, request the transition to the review stage.',
+    '',
+    'If publishing is impossible, say so plainly and leave the item in execute. Never report success without a pushed branch and an open pull request.',
+  ].join('\n');
+}
+
+function beginExecution(context: FactoryStageRuleContext): FactoryRuleDecision | void {
+  // Fire ONLY on the plan-approval path. On a human board drag
+  // (`cause: 'board_drag'`) FactoryTransitionService unshifts its own
+  // sendMessage with `role: roleForStage('work','execute')` === 'work' and
+  // `prepareBinding: true`; because this handler returns a sendMessage rather
+  // than an invokeSkill, that decision is not absorbed as a precedingMessage,
+  // and the two differently-roled decisions would mint two sessions and two
+  // Railway VMs on one work item. `submit_plan` -> advanceApprovedPlan carries
+  // `cause: 'tool_result_rule'`.
+  if (context.cause !== 'tool_result_rule') return;
+  return {
+    type: 'sendMessage',
+    // Keyed on item + revision, not the inherited ingress chain: that chain
+    // already runs ~200 of the 256-char idempotencyKey budget, and an overflow
+    // throws inside the handler, which transition() commits as `rule_error` —
+    // the item would never enter execute at all. Revision advances on every
+    // transition, so this stays distinct per entry into the stage.
+    idempotencyKey: `execute-kickoff:${context.item.id}:${context.itemRevision}`,
+    // Reuse the planning binding rather than minting a role of its own: the
+    // plan session already holds the approved plan and the materialized
+    // worktree, and this is the same session a human nudge would land on.
+    role: 'plan',
+    message: executeInstructions(context),
+    // The plan turn has ended by now, so the binding is idle by definition.
+    // No `prepareBinding`: on this path the plan binding is live in-process, so
+    // it would only matter after a pm2 restart with a kickoff still queued —
+    // where it would silently mint a fresh, plan-less session on a new VM and
+    // tell it to "proceed with the approved plan" it cannot see. Failing loudly
+    // with "No active Factory binding for role plan." is the better outcome.
+    idleBehavior: 'wake',
+  };
+}
+
+const rules = defaultFactoryRules({
+  version: FACTORY_RULE_VERSION,
+  overrides: {
+    work: {
+      execute: {
+        // `issue` only. `linearIssue` and `manual` are deliberately absent:
+        // the binding path runs `factoryRuleBranch`, which throws for anything
+        // that is not a GitHub issue/PR, so those leaves could only ever burn
+        // 5 dispatcher attempts and go terminal. The message body is
+        // GitHub-shaped for the same reason.
+        issue: { onEnter: beginExecution },
+      },
+    },
+  },
+});
+
 export const factory = new MastraFactory({
   auth,
   integrations,
+  rules,
   sandbox: {
     machine: sandbox,
     // Remote checkout base (nested `owner/name` per repo). LocalSandbox ignores
