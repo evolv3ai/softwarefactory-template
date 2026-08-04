@@ -17,6 +17,7 @@
  * the server.
  */
 
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { Mastra } from '@mastra/core/mastra';
@@ -74,6 +75,84 @@ if (redisUrl) {
   console.log(`[PubSub] REDIS_URL set — event bus on Redis Streams (${redisTarget}), cross-process leases enabled.`);
 }
 
+/**
+ * Patch 10 — static machine-token auth for admin scripts. OFF BY DEFAULT.
+ *
+ * Every request-auth path funnels through the ONE provider instance built
+ * below: the factory gate on /web/* calls provider.authenticateToken(token,
+ * request) and nothing else (@mastra/factory dist/auth.js — the gate never
+ * calls authorizeUser), and the core /api/* middleware uses the same instance.
+ * So teaching this single method one extra credential covers the whole HTTP
+ * surface at once, without touching routes or the gate's exemption list.
+ *
+ * A request presenting `Authorization: Bearer $FACTORY_MACHINE_TOKEN`
+ * authenticates as the real deployment owner (id/workosId =
+ * FACTORY_MACHINE_USER_ID, organizationId = FACTORY_MACHINE_ORG_ID), so tenant
+ * resolution ({orgId} project scoping, 403 organization_required) and
+ * stage_history actor attribution behave exactly as a UI session would.
+ * organizationId is LOAD-BEARING: it short-circuits ensureUserOrg, so no live
+ * WorkOS call runs per request and no junk personal org can be created.
+ *
+ * Browser auth is byte-identically preserved: cookie navigations reach the
+ * gate with token === '' and real WorkOS JWTs don't match the digest, so both
+ * fall straight through to super, which runs the wos_session cookie path
+ * first. A subclass (not a wrapper) keeps `instanceof MastraAuthWorkos` true
+ * for the WorkOS-only feature gates in @mastra/factory dist/auth.js.
+ *
+ * Activation needs ALL THREE env vars; anything missing → pure passthrough.
+ * Script-side rules (enforced by callers, not this class): transitions MUST
+ * send a non-'board_drag' cause or FactoryTransitionService unshifts a
+ * VM-spawning sendMessage; and machine transitions read as actor.type 'human',
+ * so a script transition into execute does NOT fire the patch-5/9 kickoff.
+ */
+class MachineTokenAuthWorkos extends MastraAuthWorkos {
+  #userId = process.env.FACTORY_MACHINE_USER_ID?.trim() ?? '';
+  #orgId = process.env.FACTORY_MACHINE_ORG_ID?.trim() ?? '';
+  // sha256 both sides of the compare: fixed 32-byte buffers keep
+  // timingSafeEqual constant-time and immune to length mismatch throws.
+  #digest = (() => {
+    const t = process.env.FACTORY_MACHINE_TOKEN?.trim();
+    return t ? createHash('sha256').update(t).digest() : null;
+  })();
+
+  #active(): boolean {
+    return Boolean(this.#digest && this.#userId && this.#orgId);
+  }
+
+  #matches(token: string): boolean {
+    if (!this.#digest || !token) return false;
+    const incoming = createHash('sha256').update(token).digest();
+    return timingSafeEqual(incoming, this.#digest);
+  }
+
+  // Signature/return type mirror the parent via indexed-access types, so this
+  // stays correct across @mastra/auth-workos minor bumps without new imports.
+  async authenticateToken(
+    token: string,
+    request: Parameters<MastraAuthWorkos['authenticateToken']>[1],
+  ): Promise<Awaited<ReturnType<MastraAuthWorkos['authenticateToken']>>> {
+    if (this.#active() && this.#matches(token)) {
+      return {
+        id: this.#userId,
+        workosId: this.#userId, // getFactoryAuthUserId = workosId ?? id — both required
+        organizationId: this.#orgId, // absent → 403 organization_required on every route
+        email: process.env.FACTORY_MACHINE_EMAIL?.trim() || undefined,
+        name: 'Factory Admin (machine token)',
+      };
+    }
+    return super.authenticateToken(token, request);
+  }
+}
+
+if (
+  process.env.FACTORY_MACHINE_TOKEN?.trim() &&
+  !(process.env.FACTORY_MACHINE_USER_ID?.trim() && process.env.FACTORY_MACHINE_ORG_ID?.trim())
+) {
+  console.warn(
+    '[auth] FACTORY_MACHINE_TOKEN set but FACTORY_MACHINE_USER_ID/ORG_ID missing — machine auth INERT (delegating to WorkOS).',
+  );
+}
+
 // Factory dev is auth-less by default. Production can opt out explicitly;
 // otherwise MastraFactory installs its platform-backed auth provider.
 const authDisabled = process.env.MASTRACODE_AUTH_DISABLED === '1';
@@ -85,7 +164,9 @@ if (authDisabled) {
   // WORKOS_* env vars present → use WorkOS AuthKit instead of the default
   // MastraAuthStudio (which proxies to platform.mastra.ai). MastraAuthWorkos
   // reads apiKey/clientId/redirectUri/cookiePassword from env on its own.
-  auth = new MastraAuthWorkos();
+  // Patch 10: the subclass adds the optional machine-token credential and is
+  // env-inert when the FACTORY_MACHINE_* group is unset.
+  auth = new MachineTokenAuthWorkos();
 }
 
 // Direct GitHub App fallback: when the platform-backed integration isn't in
