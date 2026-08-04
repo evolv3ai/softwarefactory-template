@@ -12,32 +12,32 @@ importers:
         specifier: ^1.6.4
         version: 1.6.4(hono@4.12.32)(typescript@5.9.3)
       '@mastra/code-sdk':
-        specifier: 1.1.0-alpha.4
-        version: 1.1.0-alpha.4(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)
+        specifier: 1.1.1
+        version: 1.1.1(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)
       '@mastra/core':
-        specifier: 1.54.0-alpha.4
-        version: 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+        specifier: 1.55.0
+        version: 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       '@mastra/factory':
-        specifier: 0.2.2-alpha.4
-        version: 0.2.2-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)(typescript@5.9.3)
+        specifier: 0.3.0
+        version: 0.3.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)(typescript@5.9.3)
       '@mastra/libsql':
-        specifier: 1.18.0-alpha.1
-        version: 1.18.0-alpha.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)
+        specifier: 1.18.0
+        version: 1.18.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)
       '@mastra/memory':
-        specifier: 1.24.0-alpha.0
-        version: 1.24.0-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+        specifier: 1.24.0
+        version: 1.24.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
       '@mastra/pg':
-        specifier: 1.18.0-alpha.2
-        version: 1.18.0-alpha.2(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+        specifier: 1.18.1
+        version: 1.18.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
       '@mastra/platform-workspace':
-        specifier: 0.2.2-alpha.0
-        version: 0.2.2-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+        specifier: 0.2.3
+        version: 0.2.3(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
       '@mastra/railway':
         specifier: ^0.4.0
-        version: 0.4.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+        version: 0.4.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
       '@mastra/redis-streams':
         specifier: 0.3.0
-        version: 0.3.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(@opentelemetry/api@1.9.1)
+        version: 0.3.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(@opentelemetry/api@1.9.1)
       zod:
         specifier: ^4.3.6
         version: 4.4.3
@@ -46,8 +46,8 @@ importers:
         specifier: 22.20.1
         version: 22.20.1
       mastra:
-        specifier: 1.20.3-alpha.4
-        version: 1.20.3-alpha.4(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3)
+        specifier: 1.21.0
+        version: 1.21.0(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3)
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -179,12 +179,6 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider-utils@2.2.8':
-    resolution: {integrity: sha512-fqhG+4sCVv8x7nFzYnFo19ryhAa3w096Kmc3hWxMQfW/TubPOmt3A6tYZhl4mUfQWWQMsuSkLrtjlWuXBVSGQA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.23.8
-
   '@ai-sdk/provider-utils@3.0.30':
     resolution: {integrity: sha512-NCJ9JKow5ENAgEZxzvEvF20thwDiH+hutvzmrUDbloRX0azpJHNst8+7pZIVryYhLM9wgpT5/ShTSjPTFhkxEQ==}
     engines: {node: '>=18'}
@@ -203,10 +197,6 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider@1.1.3':
-    resolution: {integrity: sha512-qZMxYJ0qqX/RfnuIaab+zp8UAeJn/ygXXAffR5I4N0n1IrvA6qBsjc8hXLmBiMV2zoXlifkacF7sEFnYnjBcqg==}
-    engines: {node: '>=18'}
-
   '@ai-sdk/provider@2.0.3':
     resolution: {integrity: sha512-h88OPkavHTiN9tMn2l5awAznGB0lXzjcLhgR1/rvjB2zlLprsNxbM2tt6OJsHUxduLC3klq0/eqaSf6fX5XVww==}
     engines: {node: '>=18'}
@@ -224,12 +214,6 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/ui-utils@1.2.11':
-    resolution: {integrity: sha512-3zcwCc8ezzFlwp3ZD15wAPjf2Au4s3vAbKsXQVyhxODHcmu0iyPO2Eua6D/vicq/AUm/BAo60r97O6HU+EI0+w==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.23.8
 
   '@ai-sdk/xai@2.0.83':
     resolution: {integrity: sha512-wCDYt0JWC7i2ZhrClEfATq8G8UAcbn/SHTWVjMhINX/A7f3inKiuDGi1D4JMFHC8Jr4alGh7Fp4eqiV8bsI0Jg==}
@@ -919,8 +903,8 @@ packages:
       '@mastra/core': '>=1.22.0-0 <2.0.0-0'
       zod: ^3.25.0 || ^4.0.0
 
-  '@mastra/auth-studio@1.3.3-alpha.0':
-    resolution: {integrity: sha512-/rbrVqotftjKneEvV9o+SqfQUd2kwK680sXTQHOYjrHpgRyJ0QOeVEKsMhRinKUA+W2G36L375qdoGIrcU8lZA==}
+  '@mastra/auth-studio@1.3.3':
+    resolution: {integrity: sha512-RyhThdNsnbCLMgyHl52WRhc+e9rn5ahL+hdK87N2JKAvP6F3Q9C5lH7CKNNJGEjZhjtxdEcXD3kU4vlskXVtVA==}
     engines: {node: '>=22.13.0'}
 
   '@mastra/auth-workos@1.6.4':
@@ -933,30 +917,30 @@ packages:
     resolution: {integrity: sha512-eGyfIxEnWpYWI+4PwPWcAvgHwraBK67gHNZ2b+clKjHsPSBiv+412qcCcTlYideif9sjXzv1crlERg/dwX1r2g==}
     engines: {node: '>=22.13.0'}
 
-  '@mastra/code-sdk@1.1.0-alpha.4':
-    resolution: {integrity: sha512-qgl3oJS2KoFbVEc4UKx02OQGoUAWyhhvvR0fb209UliZe3ezsEQnF63R6Ep9Dk0hhOkRwth2YbQMwCetVCjaVw==}
+  '@mastra/code-sdk@1.1.1':
+    resolution: {integrity: sha512-cmN1zvsAJ9x+KVP6Z5ElUXEEYMc6R2yrys4+5i1oEHpHvggMijMaa/bwUkNLk5EsNS1VCbUFgrinGR/fEU5FSQ==}
     engines: {node: '>=22.19.0'}
 
-  '@mastra/core@1.54.0-alpha.4':
-    resolution: {integrity: sha512-wjNNqsJQmjJQQ8PJeK91XUBDuD7fFAXNN4kpBOKhaGHi/ZAIBgKfzLWcDghuIZaCBkN9qksYsPHwIi8w2zomZQ==}
+  '@mastra/core@1.55.0':
+    resolution: {integrity: sha512-h6Ic64TE3KbmbjUXOxSXfyhAGyT8AzCJgfe8GnC4zQukXhpfz0J7jUgOUr9B+O9sC6EQ1LsHjjsmXBfE0xNSrw==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  '@mastra/deployer@1.54.0':
-    resolution: {integrity: sha512-JmtJsDz/HwmVo61ng/q29Q+YJhAn7F2Sq3ddbd9dM3U1aHAEdAkJuLPXfq404f3ZwUQniFjbY60c3CXQRe/mdA==}
+  '@mastra/deployer@1.55.0':
+    resolution: {integrity: sha512-m1s4cwtNADVsv37vQ6UBqU/ey2Vr5ezo5LnGGBfSkrabqWC5M0OsSu2rA0iTV/oFSWfWwdV3eHCXntQ12SYPFQ==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.50.0-0 <2.0.0-0'
 
-  '@mastra/duckdb@1.5.2-alpha.0':
-    resolution: {integrity: sha512-UVSPqkUYkQpQX1AlF3pcLXkhPzC1hC8VF0l1w/QNe62lYT65iSFwv/3iCi+RbR7RaZ3+YoYtW6cvEEcDKcBQLQ==}
+  '@mastra/duckdb@1.5.2':
+    resolution: {integrity: sha512-oLFY85odDGFSVWKscUjlrVVewgvG8Qj3VC2jbCy98VkQLPYuNtNAUkZHtxtOL5NrqeIxEgHtZQQlx1Zi9u0o8Q==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.0.0-0 <2.0.0-0'
 
-  '@mastra/factory@0.2.2-alpha.4':
-    resolution: {integrity: sha512-/GJULHlp8QkDY2hSCUVJNOBQhCXBdij7AX5anz6GM2W9rGRiDlK+ob2qOV/e93zbGyInpSf11VMc1gznXKKdaQ==}
+  '@mastra/factory@0.3.0':
+    resolution: {integrity: sha512-P0AVs7QGGPNff7b49OZ33I6tOi2YGOc9CTeSXsPtFddijajn4Lq409KBRGijOWaQxljl9oYsYGtbpcvtCvtT7Q==}
     engines: {node: '>=22.19.0'}
 
   '@mastra/fastembed@1.2.0':
@@ -970,8 +954,8 @@ packages:
       '@mastra/core': '>=1.0.0-0 <2.0.0-0'
       zod: '>=3.0.0 || >=4.0.0'
 
-  '@mastra/libsql@1.18.0-alpha.1':
-    resolution: {integrity: sha512-t7CW4FOBQ+WGgVB80hN1ShOfuYGt7dAlccr+6YAtK7HJATfuxlEaYcqoqcaxX8K5Rz7iUYVGr8d1MXZ+bNN/NQ==}
+  '@mastra/libsql@1.18.0':
+    resolution: {integrity: sha512-Q1oZaYDORJ0w8wYnU5R/BhoyauJ7gD+8SDfkMcvuWZMC8+aN+uxLmeMstfOTK2Q97hgl4Zd+qQEgs2mKUQ5tTA==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.51.0-0 <2.0.0-0'
@@ -988,27 +972,27 @@ packages:
     peerDependencies:
       '@mastra/core': '>=1.0.0-0 <2.0.0-0'
 
-  '@mastra/memory@1.24.0-alpha.0':
-    resolution: {integrity: sha512-Z0rA208gwerWrZPXQ37pNsSaln5Yza7mxYDQ+Oe0kDnMdypI1lKC1k+XpQijO7GA0dye8fTdVl7RJY2jSmGyEg==}
+  '@mastra/memory@1.24.0':
+    resolution: {integrity: sha512-C3L6fdiCQCKF7wxALgW9bQ6vCuUWtfEW4qx2Z8Fac/cIKK5D75Yr+kl8CvTo73zB/NjW77HGE/oLshFJge0hYQ==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.4.1-0 <2.0.0-0'
 
-  '@mastra/observability@1.16.3-alpha.0':
-    resolution: {integrity: sha512-nPWzQOKywFbQRcc6cQVehCFIB1bDTXAw+y8snxbJqYEhn0kXYVhzzCuGopIHQBDl9X5VjgXpEcVg+dSMw2+FkA==}
+  '@mastra/observability@1.16.3':
+    resolution: {integrity: sha512-HC/KsCGzeJN3b2GAf2koE0QfRhtur1i03lE5EO6c8cnjQ9wU4Y8dJ5jCvG3WmNcv4Q+ILcR1UeDtrHYYxLL43Q==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.16.0-0 <2.0.0-0'
       zod: ^3.25.0 || ^4.0.0
 
-  '@mastra/pg@1.18.0-alpha.2':
-    resolution: {integrity: sha512-EAZepZMLtNdcJZEAJxl0ZZOWdO/NEwu9Ez/7K6EHtvdKA2luFQoEsig6/ghpXehIRbLgmtmstBaIGhXxmBdAgw==}
+  '@mastra/pg@1.18.1':
+    resolution: {integrity: sha512-+naYcO81dB4XWLuPUX3NuhUWD9UBB0xMG+CQqYtZlQwCVeBRvjkI5k/ONL0mRpEP6e9sFDOekB16AvU2FiqL8g==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.51.0-0 <2.0.0-0'
 
-  '@mastra/platform-workspace@0.2.2-alpha.0':
-    resolution: {integrity: sha512-EOLCxzYOWh6crrgC14iUNuPv2zT3xzeuyYXkoBwa0rN9vh+xT0O2ppVIUkXdFFHQ7zajV6tUy0byOOJXS2naRA==}
+  '@mastra/platform-workspace@0.2.3':
+    resolution: {integrity: sha512-eskw0e4hUU4HQMV38QI0ikxeV5bI+wvp4Te2ZvCczxuPLf6ap25qFxxoNixAaHKwDdA33xH1lEBTsfzyocnZ6w==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.4.0-0 <2.0.0-0'
@@ -1031,8 +1015,8 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  '@mastra/server@1.54.0':
-    resolution: {integrity: sha512-iwiEp/J4QTd9KXs+GFZp6mCdWcgQT5dQZkNpOWaul9IkqmzQQMv52OxBVxb8PCANpvciHzvamHYAR2V14f4JwQ==}
+  '@mastra/server@1.55.0':
+    resolution: {integrity: sha512-LhVUmMr27RzlcvS6WGqMUTzVtHs+sZCTmZE2v3WUhuDpI9eXx/CCM0DhVTBtpOt7kpmLU61AXolGiDRy/I/3Sw==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@mastra/core': '>=1.50.0-0 <2.0.0-0'
@@ -3007,8 +2991,8 @@ packages:
   marky@1.3.0:
     resolution: {integrity: sha512-ocnPZQLNpvbedwTy9kNrQEsknEfgvcLMvOtz3sFeWApDq1MXH1TqkCIx58xlpESsfwQOnuBO9beyQuNGzVvuhQ==}
 
-  mastra@1.20.3-alpha.4:
-    resolution: {integrity: sha512-Bl2j/x09tqvqFtUOnyswmMRZI+p4f3050cinpfa/d2pH4uIiXSWp3QaB+5LdGgb5WQ9xya48/j/cqn+lxRAbpQ==}
+  mastra@1.21.0:
+    resolution: {integrity: sha512-pEGXuSMYmJEyDLXirZuk0scMACehvY6LzmDE7aIQlno6GdN9jCH5zN8b6tKSBQtwwY8WQE8g4G0CI3mkAxR9dQ==}
     engines: {node: '>=22.13.0'}
     hasBin: true
     peerDependencies:
@@ -3227,11 +3211,6 @@ packages:
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
-
-  nanoid@3.3.16:
-    resolution: {integrity: sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
 
   needle@2.9.1:
     resolution: {integrity: sha512-6R9fqJ5Zcmf+uYaFgdIHmLwNldn5HbK8L5ybn7Uz+ylX/rnOsSp1AHcvQSrCaFN+qNM1wpymHqD7mVasEOlHGQ==}
@@ -3763,9 +3742,6 @@ packages:
   section-matter@1.0.0:
     resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}
     engines: {node: '>=4'}
-
-  secure-json-parse@2.7.0:
-    resolution: {integrity: sha512-6aU+Rwsezw7VR8/nyvKTx8QpWH9FrcYiXXlqC4z5d5XQBDRqtbfsRjnwGyqbi3gddNtWHuEk9OANUotL26qKUw==}
 
   secure-json-parse@4.1.0:
     resolution: {integrity: sha512-l4KnYfEyqYJxDwlNVyRfO2E4NTHfMKAWdUuA8J0yve2Dz/E/PdBepY03RvyJpssIpRFwJoCD55wA+mEDs6ByWA==}
@@ -4459,13 +4435,6 @@ snapshots:
       zod: 4.4.3
     optional: true
 
-  '@ai-sdk/provider-utils@2.2.8(zod@4.4.3)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      nanoid: 3.3.16
-      secure-json-parse: 2.7.0
-      zod: 4.4.3
-
   '@ai-sdk/provider-utils@3.0.30(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 2.0.3
@@ -4488,10 +4457,6 @@ snapshots:
       eventsource-parser: 3.1.0
       zod: 4.4.3
 
-  '@ai-sdk/provider@1.1.3':
-    dependencies:
-      json-schema: 0.4.0
-
   '@ai-sdk/provider@2.0.3':
     dependencies:
       json-schema: 0.4.0
@@ -4511,13 +4476,6 @@ snapshots:
       '@ai-sdk/provider-utils': 3.0.30(zod@4.4.3)
       zod: 4.4.3
     optional: true
-
-  '@ai-sdk/ui-utils@1.2.11(zod@4.4.3)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@4.4.3)
-      zod: 4.4.3
-      zod-to-json-schema: 3.25.2(zod@4.4.3)
 
   '@ai-sdk/xai@2.0.83(zod@4.4.3)':
     dependencies:
@@ -5266,9 +5224,9 @@ snapshots:
     dependencies:
       '@lukeed/csprng': 1.1.0
 
-  '@mastra/agent-browser@0.4.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(zod@4.4.3)':
+  '@mastra/agent-browser@0.4.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(zod@4.4.3)':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       agent-browser: 0.19.0(bufferutil@4.1.0)
       zod: 4.4.3
     transitivePeerDependencies:
@@ -5280,7 +5238,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@mastra/auth-studio@1.3.3-alpha.0': {}
+  '@mastra/auth-studio@1.3.3': {}
 
   '@mastra/auth-workos@1.6.4(hono@4.12.32)(typescript@5.9.3)':
     dependencies:
@@ -5300,7 +5258,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mastra/code-sdk@1.1.0-alpha.4(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)':
+  '@mastra/code-sdk@1.1.1(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)':
     dependencies:
       '@agentclientprotocol/sdk': 0.21.1(zod@4.4.3)
       '@ai-sdk/amazon-bedrock': 3.0.111(zod@4.4.3)
@@ -5309,19 +5267,19 @@ snapshots:
       '@ai-sdk/openai-compatible': 2.0.62(zod@4.4.3)
       '@ast-grep/napi': 0.42.3
       '@aws-sdk/credential-providers': 3.1097.0
-      '@mastra/agent-browser': 0.4.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(zod@4.4.3)
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
-      '@mastra/duckdb': 1.5.2-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+      '@mastra/agent-browser': 0.4.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/duckdb': 1.5.2(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
       '@mastra/fastembed': 1.2.0
-      '@mastra/github-signals': 0.2.2(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
-      '@mastra/libsql': 1.18.0-alpha.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)
-      '@mastra/mcp': 1.15.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
-      '@mastra/memory': 1.24.0-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
-      '@mastra/observability': 1.16.3-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
-      '@mastra/pg': 1.18.0-alpha.2(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+      '@mastra/github-signals': 0.2.2(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
+      '@mastra/libsql': 1.18.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)
+      '@mastra/mcp': 1.15.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
+      '@mastra/memory': 1.24.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+      '@mastra/observability': 1.16.3(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
+      '@mastra/pg': 1.18.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
       '@mastra/schema-compat': 1.3.4(zod@4.4.3)
-      '@mastra/stagehand': 0.3.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(playwright-core@1.62.0)(zod@4.4.3)
-      '@mastra/tavily': 1.1.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
+      '@mastra/stagehand': 0.3.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(playwright-core@1.62.0)(zod@4.4.3)
+      '@mastra/tavily': 1.1.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
       ai: 6.0.237(zod@4.4.3)
       execa: 9.6.1
       libsql: 0.5.29
@@ -5353,7 +5311,7 @@ snapshots:
       - utf-8-validate
       - workflow
 
-  '@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)':
+  '@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)':
     dependencies:
       '@a2a-js/sdk': 0.3.14(express@5.2.1)
       '@ai-sdk/provider-utils-v5': '@ai-sdk/provider-utils@3.0.30(zod@4.4.3)'
@@ -5362,7 +5320,6 @@ snapshots:
       '@ai-sdk/provider-v5': '@ai-sdk/provider@2.0.3'
       '@ai-sdk/provider-v6': '@ai-sdk/provider@3.0.14'
       '@ai-sdk/provider-v7': '@ai-sdk/provider@4.0.3'
-      '@ai-sdk/ui-utils-v5': '@ai-sdk/ui-utils@1.2.11(zod@4.4.3)'
       '@isaacs/ttlcache': 2.1.5
       '@lukeed/uuid': 2.0.1
       '@mastra/schema-compat': 1.3.4(zod@4.4.3)
@@ -5400,14 +5357,14 @@ snapshots:
       - utf-8-validate
       - workflow
 
-  '@mastra/deployer@1.54.0(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3)':
+  '@mastra/deployer@1.55.0(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3)':
     dependencies:
       '@babel/core': 8.0.1
       '@babel/preset-typescript': 8.0.1(@babel/core@8.0.1)
       '@babel/traverse': 8.0.4
       '@hono/node-ws': 1.3.1(@hono/node-server@2.0.12(hono@4.12.32))(bufferutil@4.1.0)(hono@4.12.32)
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
-      '@mastra/server': 1.54.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/server': 1.55.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)
       '@optimize-lodash/rollup-plugin': 5.1.0(rollup@4.62.3)
       '@rollup/plugin-alias': 6.0.0(rollup@4.62.3)
       '@rollup/plugin-commonjs': 29.0.2(rollup@4.62.3)
@@ -5438,17 +5395,17 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@mastra/duckdb@1.5.2-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
+  '@mastra/duckdb@1.5.2(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
     dependencies:
       '@duckdb/node-api': 1.5.2-r.2
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
 
-  '@mastra/factory@0.2.2-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)(typescript@5.9.3)':
+  '@mastra/factory@0.3.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)(typescript@5.9.3)':
     dependencies:
-      '@mastra/auth-studio': 1.3.3-alpha.0
+      '@mastra/auth-studio': 1.3.3
       '@mastra/auth-workos': 1.6.4(hono@4.12.32)(typescript@5.9.3)
-      '@mastra/code-sdk': 1.1.0-alpha.4(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/code-sdk': 1.1.1(bufferutil@4.1.0)(express@5.2.1)(playwright-core@1.62.0)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       '@octokit/auth-app': 8.2.0
       '@octokit/rest': 22.0.1
       hono: 4.12.32
@@ -5485,28 +5442,28 @@ snapshots:
       progress: 2.0.3
       tar: 7.5.22
 
-  '@mastra/github-signals@0.2.2(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
+  '@mastra/github-signals@0.2.2(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       zod: 4.4.3
 
-  '@mastra/libsql@1.18.0-alpha.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)':
+  '@mastra/libsql@1.18.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)':
     dependencies:
       '@libsql/client': 0.17.4(bufferutil@4.1.0)
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@mastra/loggers@1.2.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
+  '@mastra/loggers@1.2.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       pino: 10.3.1
       pino-pretty: 13.1.3
 
-  '@mastra/mcp@1.15.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
+  '@mastra/mcp@1.15.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       '@modelcontextprotocol/ext-apps': 1.7.5(@modelcontextprotocol/sdk@1.30.0(zod@4.4.3))(zod@4.4.3)
       '@modelcontextprotocol/sdk': 1.30.0(zod@4.4.3)
       exit-hook: 5.1.0
@@ -5518,9 +5475,9 @@ snapshots:
       - supports-color
       - zod
 
-  '@mastra/memory@1.24.0-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
+  '@mastra/memory@1.24.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       '@mastra/schema-compat': 1.3.4(zod@4.4.3)
       async-mutex: 0.5.0
       diff: 8.0.4
@@ -5534,14 +5491,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mastra/observability@1.16.3-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
+  '@mastra/observability@1.16.3(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       zod: 4.4.3
 
-  '@mastra/pg@1.18.0-alpha.2(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
+  '@mastra/pg@1.18.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       async-mutex: 0.5.0
       pg: 8.22.0
       pg-connection-string: 2.14.0
@@ -5549,18 +5506,18 @@ snapshots:
     transitivePeerDependencies:
       - pg-native
 
-  '@mastra/platform-workspace@0.2.2-alpha.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
+  '@mastra/platform-workspace@0.2.3(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
 
-  '@mastra/railway@0.4.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
+  '@mastra/railway@0.4.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       railway: 3.7.0
 
-  '@mastra/redis-streams@0.3.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(@opentelemetry/api@1.9.1)':
+  '@mastra/redis-streams@0.3.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(@opentelemetry/api@1.9.1)':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       redis: 5.12.1(@opentelemetry/api@1.9.1)
     transitivePeerDependencies:
       - '@node-rs/xxhash'
@@ -5574,16 +5531,16 @@ snapshots:
       zod-from-json-schema-v3: zod-from-json-schema@0.0.5
       zod-to-json-schema: 3.25.2(zod@4.4.3)
 
-  '@mastra/server@1.54.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
+  '@mastra/server@1.55.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       hono: 4.12.32
       zod: 4.4.3
 
-  '@mastra/stagehand@0.3.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(playwright-core@1.62.0)(zod@4.4.3)':
+  '@mastra/stagehand@0.3.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(playwright-core@1.62.0)(zod@4.4.3)':
     dependencies:
       '@browserbasehq/stagehand': 3.7.1(playwright-core@1.62.0)(zod@4.4.3)
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       zod: 4.4.3
     transitivePeerDependencies:
       - '@cfworker/json-schema'
@@ -5594,9 +5551,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@mastra/tavily@1.1.1(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
+  '@mastra/tavily@1.1.1(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
       '@tavily/core': 0.7.6
       zod: 4.4.3
     transitivePeerDependencies:
@@ -6416,7 +6373,7 @@ snapshots:
     dependencies:
       ansi-align: 3.0.1
       camelcase: 7.0.1
-      chalk: 5.0.1
+      chalk: 5.6.2
       cli-boxes: 3.0.0
       string-width: 5.1.2
       type-fest: 2.19.0
@@ -7618,15 +7575,15 @@ snapshots:
   marky@1.3.0:
     optional: true
 
-  mastra@1.20.3-alpha.4(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3):
+  mastra@1.21.0(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3):
     dependencies:
       '@babel/parser': 8.0.4
       '@babel/types': 8.0.4
       '@clack/prompts': 1.7.0
       '@expo/devcert': 1.2.1
-      '@mastra/core': 1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
-      '@mastra/deployer': 1.54.0(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3)
-      '@mastra/loggers': 1.2.0(@mastra/core@1.54.0-alpha.4(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
+      '@mastra/core': 1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3)
+      '@mastra/deployer': 1.55.0(@hono/node-server@2.0.12(hono@4.12.32))(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))(bufferutil@4.1.0)(typescript@5.9.3)(zod@4.4.3)
+      '@mastra/loggers': 1.2.0(@mastra/core@1.55.0(ai@6.0.237(zod@4.4.3))(bufferutil@4.1.0)(express@5.2.1)(zod@4.4.3))
       archiver: 8.0.0
       commander: 14.0.3
       dotenv: 17.4.2
@@ -8026,8 +7983,6 @@ snapshots:
   ms@2.0.0: {}
 
   ms@2.1.3: {}
-
-  nanoid@3.3.16: {}
 
   needle@2.9.1:
     dependencies:
@@ -8635,8 +8590,6 @@ snapshots:
     dependencies:
       extend-shallow: 2.0.1
       kind-of: 6.0.3
-
-  secure-json-parse@2.7.0: {}
 
   secure-json-parse@4.1.0: {}
 
